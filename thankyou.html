@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Thank You - Warm Theme</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Open+Sans&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #3e1f0d, #5a2a0c);
+      font-family: 'Open Sans', sans-serif;
+      text-align: center;
+      overflow: hidden;
+      color: #fcefe6;
+    }
+
+    h1, p {
+      opacity: 0;
+      transition: opacity 2s ease-in-out;
+    }
+
+    h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 3.5em;
+      color: #ffb74d;
+      margin-top: 80px;
+    }
+
+    p {
+      font-size: 1.2em;
+      max-width: 700px;
+      margin: 30px auto;
+      color: #ffe0b2;
+    }
+
+    footer {
+      font-style: italic;
+      margin-top: 20px;
+      color: #d7ccc8;
+    }
+
+    #surprise {
+      display: inline-block;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 1s ease, transform 1s ease;
+      margin-top: 20px;
+    }
+
+    #surprise.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .hint-popup {
+      position: relative;
+      top: -10px;
+      font-size: 1em;
+      color: #ffcc80;
+      opacity: 0;
+      transition: opacity 1s ease;
+      animation: fadeInHint 2s forwards 1s;
+      font-style: italic;
+    }
+
+    @keyframes fadeInHint {
+      to {
+        opacity: 0.7;
+      }
+    }
+
+    .gift-box {
+      width: 120px;
+      height: 120px;
+      border-radius: 16px;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: linear-gradient(145deg, #bf360c, #d84315);
+      box-shadow: 0 4px 12px rgba(255, 87, 34, 0.5);
+      transition: transform 0.3s ease;
+    }
+
+    .gift-icon {
+      font-size: 3em;
+      transition: transform 0.3s ease;
+    }
+
+    .gift-box.clicked {
+      transform: scale(1.2);
+    }
+
+    .gift-box.clicked .gift-icon {
+      transform: scale(0.7);
+    }
+
+    .popup {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: #4e342e;
+      padding: 30px 50px;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      font-family: 'Dancing Script', cursive;
+      font-size: 2.5em;
+      color: #ffcc80;
+      z-index: 10;
+      transition: transform 0.5s ease, opacity 0.5s ease;
+      opacity: 0;
+    }
+
+    .popup.show {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .fireworks {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 id="thankyou-text">Thank You! 💖</h1>
+  <p id="message-text">Thank you for making my birthday so memorable! Your lovely wishes meant the world to me and truly brightened my day. I appreciate you all more than words can say.</p>
+
+  <!-- Gift Box with Hint -->
+  <div id="surprise">
+    <div class="hint-popup" id="hintPopup">Click the gift! 🎁</div>
+    <div class="gift-box" id="giftBox">
+      <div class="gift-icon">🎁</div>
+    </div>
+  </div>
+
+  <!-- Fireworks -->
+  <div class="fireworks">
+    <canvas id="firework-canvas"></canvas>
+  </div>
+
+  <!-- Thank You Popup -->
+  <div id="popup" class="popup">Thank you Again! 🧡</div>
+
+  <footer>With love,<br><strong>Tushar</strong></footer>
+
+  <script>
+    // Text & gift box reveal
+    window.onload = function () {
+      document.getElementById("thankyou-text").style.opacity = 1;
+      setTimeout(() => {
+        document.getElementById("message-text").style.opacity = 1;
+      }, 2000);
+      setTimeout(() => {
+        const surprise = document.getElementById("surprise");
+        surprise.style.display = "inline-block";
+        setTimeout(() => surprise.classList.add("show"), 50);
+      }, 4000);
+    };
+
+    // Fireworks setup
+    const canvas = document.getElementById('firework-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let particles = [];
+
+    function createFirework(x, y, color) {
+      for (let i = 0; i < 30; i++) {
+        particles.push({
+          x,
+          y,
+          dx: (Math.random() - 0.5) * 8,
+          dy: (Math.random() - 0.5) * 8,
+          radius: 2 + Math.random() * 2,
+          alpha: 1,
+          color
+        });
+      }
+    }
+
+    function drawParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach((p, i) => {
+        p.x += p.dx;
+        p.y += p.dy;
+        p.alpha -= 0.02;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${hexToRGB(p.color)}, ${p.alpha})`;
+        ctx.fill();
+
+        if (p.alpha <= 0) particles.splice(i, 1);
+      });
+
+      requestAnimationFrame(drawParticles);
+    }
+
+    function hexToRGB(hex) {
+      const bigint = parseInt(hex.slice(1), 16);
+      return `${(bigint >> 16) & 255},${(bigint >> 8) & 255},${bigint & 255}`;
+    }
+
+    const giftBox = document.getElementById("giftBox");
+    const popup = document.getElementById("popup");
+    const hint = document.getElementById("hintPopup");
+
+    giftBox.addEventListener("click", function () {
+      // Hide hint
+      hint.style.display = "none";
+
+      // Animate gift
+      giftBox.classList.add("clicked");
+      setTimeout(() => giftBox.classList.remove("clicked"), 400);
+
+      const rect = giftBox.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const colors = ["#ff9800", "#ff5722", "#ffcc80", "#f48fb1", "#ffb74d"];
+      const color = colors[Math.floor(Math.random() * colors.length)];
+
+      createFirework(centerX, centerY, color);
+
+      // Show popup
+      popup.classList.add("show");
+      setTimeout(() => popup.classList.remove("show"), 2500);
+    });
+
+    drawParticles();
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
